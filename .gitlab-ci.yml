@@ -1,0 +1,75 @@
+image: node:20
+
+# Cache node_modules for faster builds
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - node_modules/
+    - .expo/
+    - ~/.npm/
+
+stages:
+  - install
+  - lint
+  - type-check
+  - test
+
+# Install dependencies
+install_dependencies:
+  stage: install
+  script:
+    - npm ci --legacy-peer-deps
+  artifacts:
+    paths:
+      - node_modules/
+    expire_in: 1 hour
+  only:
+    - merge_requests
+    - main
+    - develop
+    - tags
+
+# Run ESLint
+lint:
+  stage: lint
+  script:
+    - npm ci --legacy-peer-deps
+    - npm run lint
+  dependencies:
+    - install_dependencies
+  only:
+    - merge_requests
+    - main
+    - develop
+    - tags
+  allow_failure: false
+
+# TypeScript type checking
+type_check:
+  stage: type-check
+  script:
+    - npm ci --legacy-peer-deps
+    - npm run type-check
+  dependencies:
+    - install_dependencies
+  only:
+    - merge_requests
+    - main
+    - develop
+    - tags
+  allow_failure: false
+
+# Run tests (placeholder - add your tests here)
+test:
+  stage: test
+  script:
+    - npm ci --legacy-peer-deps
+    - npm run test
+  dependencies:
+    - install_dependencies
+  only:
+    - merge_requests
+    - main
+    - develop
+    - tags
+  allow_failure: false
